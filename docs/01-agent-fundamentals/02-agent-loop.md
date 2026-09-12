@@ -93,7 +93,7 @@ flowchart LR
 A single iteration normally ends after the state has been updated. The updated state becomes the input to the next iteration.
 
 ```mermaid
-flowchart TD
+flowchart LR
     A[Read Current State] --> B[Build Context]
     B --> C[Model Decision]
     C -- Action --> E[Execute Action]
@@ -103,3 +103,51 @@ flowchart TD
     G --> A
 ```
 
+### Termination Conditions 
+
+An Agent Loop must not run forever.
+
+The runtime needs explicit termination conditions.
+
+The most obvious condition is :
+- Task Completed
+- Final Answer Produced
+- Maximum iterations reached
+- Timeout reached
+- Token/cost budget exceeded
+- Human approval required
+- Unrecoverable error
+- No progress/repeated loop detected
+
+A production Agent Loop usually combines several of these conditions.
+
+```code
+iteration = 0
+while True:
+    if task_completed(state):
+        break
+    if iteration >= MAX_ITERATIONS:
+        break
+    if timeout_reched():
+        break
+    if budget_exceeded():
+        break
+
+    context = build_context(state)
+
+    decision = model.generate(context)
+
+    if decision.requires_approval:
+        pause_for_human()
+        break
+
+    if decision.final_answer:
+        return decision.final_answer
+
+    result = execute(decision.action)
+
+    state.update(result)
+    
+    iteration += 1 
+
+```
