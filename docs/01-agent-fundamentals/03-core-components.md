@@ -110,6 +110,37 @@ Current Question:
 What should I do next?
 ```
 
+The most common format of context is structured data, like JSON.
+
+```json
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a coding agent."
+    },
+    {
+      "role": "user",
+      "content": "Find the largest Python file."
+    },
+    {
+      "role": "assistant",
+      "content": "I will inspect the repository."
+    },
+    {
+      "role": "tool",
+      "content": "agent.py: 120 KB"
+    }
+  ],
+  "tools": [
+    {
+      "name": "read_file",
+      "description": "Read a file from the repository"
+    }
+  ]
+}
+```
+
 ## State
 
 ## Actions
