@@ -24,7 +24,7 @@ After this chapter, we should be able to explain:
 ## Progress
 
 - [x] What is an AI Agent?
-- [ ] Agent Loop
+- [x] Agent Loop
 - [ ] Core Components
 - [ ] LLM vs Agent
 - [ ] Model vs Agent Harness
