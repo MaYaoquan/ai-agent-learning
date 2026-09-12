@@ -23,7 +23,7 @@ After this chapter, we should be able to explain:
 
 ## Progress
 
-- [ ] What is an AI Agent?
+- [x] What is an AI Agent?
 - [ ] Agent Loop
 - [ ] Core Components
 - [ ] LLM vs Agent
