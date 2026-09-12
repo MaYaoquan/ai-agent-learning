@@ -4,11 +4,10 @@ An AI agent is an autonomous system that iteratively makes decisions based on it
 
 ## Program Execution and Agent Loop
 
-Program execution can be broadly understood through two common control styles:
+For the purpose of understanding agent execution, program control can be broadly viewed through two common styles:
 
-- **Reactive execution**: the program reacts to events, messages, requests, or times.
+- **Reactive execution**: the program reacts to events, messages, requests, or scheduled triggers.
 - **Active execution**: the program actively checks the current state or condition and continues execution.
-
 
 ```mermaid
 flowchart TD
@@ -39,10 +38,11 @@ flowchart TD
 These execution styles are not mutually exclusive. A program may be triggered by an event or a timer and then continue processing through an internal loop.
 
 When implementing an AI agent, the agent may be started by:
-- a user message,
-- an API request,
-- a scheduled task,
-- or another external event.
+
+- a user message
+- an API request
+- a scheduled task
+- another external event
 
 Therefore, once an AI agent is triggered, its internal task execution is usually driven by an **Agent Loop**.
 
@@ -55,5 +55,14 @@ flowchart TD
     C --> D[Take action]
     D --> E[Observe result]
     E --> F{Task completed?}
-    F -- No --> C
+    F -- No --> B
     F -- Yes --> G[Task completed]
+```
+
+## Key Takeaway
+
+An AI agent is a goal-directed system that can autonomously make decisions and iteratively interact with its environment.
+
+Although an agent may be triggered by an event, request, or timer, once it starts working on a task, its execution is typically driven by an Agent Loop:
+
+**Observe → Decide → Act → Evaluate → Repeat**
