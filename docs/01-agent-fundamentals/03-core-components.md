@@ -19,7 +19,7 @@ Core Components Table
 | **Context** | What does it currently know? | Information given to the model |
 | **State** | What does it remember? | Persistent task information |
 | **Actions** | What can it do? | Interact with the environment |
-| **Control Loop** | How does it progress? | Coordinate iterative execution |
+| **Action Runtime** | How is an AgentAction safely turned into a real operation? | Coordinate iterative execution |
 | **Runtime / Harness** | Who manages everything? | Orchestrate the whole Agent |
 
 
@@ -301,6 +301,63 @@ flowchart LR
 - Communication Actions
 - Delegation Actions
 
+However, there is a gap between an LLM output and an action. AI Agents usually cannot convert natural language text into AgentAction through re-expression. 
+The best way is to let the Model output a structured tool/action request. Then, using the Model Adapter, transfer provider-specific output to a uniform AgentAction.
+
+For example:
+```text
+Context
+   ↓
+Model
+   ↓
+Provider-specific structured output
+   ↓
+Model Adapter
+   ↓
+AgentAction
+   ↓
+Validation
+   ↓
+Action Runtime (Execute the action)
+```
+
+The structured-output instructions:
+
+```json
+{
+  "action_type": "tool_call",
+  "name": "read_file",
+  "arguments": {
+    "path": "agent.py"
+  }
+}
+```
+
+Transfer to AgentAction by Adapter:
+
+```python
+AgentAction(
+    action_type="tool_call",
+    name="read_file",
+    arguments={"path": "agent.py"}
+)
+```
+
+
+How to represent an action in Agent Runtime?
+
+An action can be represented as a uniform data structure.
+
+```python
+@dataclass
+class AgentAction:
+    type: str
+    name: str
+    arguments: dict
+```
+
+**One more things:**
+
 What is the difference between an Action and a Tool in an AI agent?
 
 Action = a conceptual operation. For example:
@@ -315,37 +372,12 @@ Tool:
 read_file(path="agent.py")
 ```
 
-
-
-
 ```mermaid
 flowchart LR
     A[Model Decision] --> B[Action Intent]
     B --> C[Tool Selection]
     C --> D[Tool Execution]
     D --> E[Observation]
-```
-
-How to represent an action in Agent Runtime?
-
-An action can be represented as a uniform data structure.
-
-```python
-@dataclass
-class AgentAction:
-    type: str
-    name: str
-    arguments: dict
-
-# For example
-AgentAction(
-    type="tool_call",
-    name="read_file",
-    arguments={
-        "path": "agent.py"
-    }
-)
-
 ```
 
 ## Control Loop
