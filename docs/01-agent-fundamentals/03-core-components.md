@@ -173,9 +173,104 @@ flowchart TD
 
 Context is model-visible information, not necessarily plain text.
 
+In terms of Implementation, Agent context is an internal structure. Therefore, a provider-independent internal representation of the information that should be visible to the model for the current decision.
+
+The Context Builder integrates relevant context from multiple sources into a unified internal representation.
+
+For example:
+```text
+State / Memory / Tool Results / Retrieved Data
+                    ↓
+             Context Builder
+                    ↓
+              AgentContext
+          [internal structure]
+                    ↓
+              Model Adapter
+          ┌─────────┼─────────┐
+          ↓         ↓         ↓
+       OpenAI    Claude    DeepSeek
+        schema     schema      schema
+```
+
+
+
 ## State
 
+**Definition**:
+State is the information an agent maintains across iterations that represents the task's current status and lets it continue working coherently.
+
+The clean distinction is:
+State is what the agent maintains. Context is what the model sees.
+
+So the Context Builder typically reads from the current state:
+
+```text
+Current State
+│
+├── task goal
+├── current plan
+├── completed steps
+├── previous actions
+├── tool results
+├── iteration count
+├── errors
+└── other runtime data
+        ↓
+   Context Builder
+        ↓
+Select relevant parts
+        ↓
+      Context
+        ↓
+       Model
+```
+
+For example, suppose the state is:
+
+```python
+state = {
+    "goal": "Find the largest Python file",
+    "iteration": 4,
+    "completed_steps": [
+        "listed files",
+        "filtered Python files",
+        "compared file sizes"
+    ],
+    "last_observation": "agent.py is the largest file",
+    "token_usage": 18234,
+    "start_time": "...",
+    "retry_count": 0
+}
+```
+
+The model probably needs:
+
+```text
+goal
+completed_steps
+last_observation
+```
+
+So the Context Builder might produce:
+```python
+AgentContext(
+    goal=state["goal"],
+    task_progress=state["completed_steps"],
+    observations=[state["last_observation"]],
+)
+```
+
+In conclusion, the Context Builder derives the mode-visitable context from the current agent state and other relevant information sources.
+
+```text
+Context = selected view of State + Memory + Tool Results + Retrieved Knowledge + Instructions
+```
+
+
 ## Actions
+
+
 
 ## Control Loop
 
