@@ -188,7 +188,7 @@ A useful long-term north-star question is:
 
 ---
 
-## Suggested Development Path
+## Plan Development Path
 
 ```text
 AI Agent Fundamentals
