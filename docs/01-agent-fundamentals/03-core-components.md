@@ -404,5 +404,37 @@ Capability Provider
 Observation
 ```
 
+```mermaid
+flowchart TD
+    A[Agent State] --> B[Context Builder]
+    B --> C[AgentContext]
+    C --> D[Model Adapter]
+    D --> E[Model]
+
+    E --> F[Provider Response]
+    F --> D
+    D --> G[ModelDecision]
+
+    G --> H[AgentAction]
+    G --> I[Final Answer]
+
+    H --> J[Policy / Validation]
+    J --> K[Action Dispatcher]
+
+    K --> L[Native Tool]
+    K --> M[MCP Client]
+    K --> N[API Client]
+    K --> O[Subagent]
+
+    M --> P[MCP Server]
+
+    L --> Q[Observation]
+    P --> Q
+    N --> Q
+    O --> Q
+
+    Q --> A
+```
+
 ## Agent Runtime
 
