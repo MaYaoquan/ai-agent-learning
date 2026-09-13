@@ -8,8 +8,8 @@ AI Agent
 ├── Context
 ├── State
 ├── Actions
-├── Control Loop
-└── Runtime
+├── Action Runtime
+└── Agent Runtime
 ```
 
 Core Components Table
