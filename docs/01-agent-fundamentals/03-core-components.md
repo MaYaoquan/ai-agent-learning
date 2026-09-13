@@ -270,7 +270,83 @@ Context = selected view of State + Memory + Tool Results + Retrieved Knowledge +
 
 ## Actions
 
+An action is an operation selected by the agent to interact with or change its environment.
 
+Examples include:
+- reading a file
+- searching the web
+- executing a command
+- querying a database
+- calling an API
+- sending a message
+- delegating work to another agent
+
+The model typically selects or requests an action, while the Agent Runtime validates and executes it.
+
+```mermaid
+flowchart LR
+    A[Current State] --> B[Context]
+    B --> C[Model]
+    C --> D[Decision]
+    D --> E[Action]
+    E --> F[Environment]
+    F --> G[Observation]
+    G --> A
+```
+
+**Action Type**:
+- Read / Observe Actions
+- Write / Modify Actions
+- Execution Actions
+- Communication Actions
+- Delegation Actions
+
+What is the difference between an Action and a Tool in an AI agent?
+
+Action = a conceptual operation. For example:
+```text
+Action intent:
+Read a file
+```
+
+Tool = a concrete executable interface
+```text
+Tool:
+read_file(path="agent.py")
+```
+
+
+
+
+```mermaid
+flowchart LR
+    A[Model Decision] --> B[Action Intent]
+    B --> C[Tool Selection]
+    C --> D[Tool Execution]
+    D --> E[Observation]
+```
+
+How to represent an action in Agent Runtime?
+
+An action can be represented as a uniform data structure.
+
+```python
+@dataclass
+class AgentAction:
+    type: str
+    name: str
+    arguments: dict
+
+# For example
+AgentAction(
+    type="tool_call",
+    name="read_file",
+    arguments={
+        "path": "agent.py"
+    }
+)
+
+```
 
 ## Control Loop
 
