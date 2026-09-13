@@ -23,7 +23,7 @@ After this chapter, we should be able to explain:
 
 - [x] What is an AI Agent?
 - [x] Agent Loop
-- [ ] Core Components
-- [ ] LLM vs Agent
+- [x] Core Components
+- [x] LLM vs Agent
 - [ ] Agent vs Workflow
 - [ ] Mock interview completed
