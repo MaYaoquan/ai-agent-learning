@@ -110,7 +110,7 @@ Current Question:
 What should I do next?
 ```
 
-The most common format of context is structured data, like JSON.
+The most common context format is structured data, like JSON.
 
 ```json
 {
@@ -140,6 +140,14 @@ The most common format of context is structured data, like JSON.
   ]
 }
 ```
+
+**Note**: The APIs of different models actually use different schemas. 
+
+Therefore, the context can be serialised into 
+
+#### Key Idea:
+
+Context is model-visible information, not necessarily plain text.
 
 ## State
 
