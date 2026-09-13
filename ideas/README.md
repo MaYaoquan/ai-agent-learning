@@ -6,6 +6,7 @@ Each idea is kept in a separate Markdown file so it can later evolve into an exp
 
 ## Current Ideas
 
+0. [Project Direction](00-project-direction.md)
 1. [Dynamic Multi-Model Routing](01-dynamic-multi-model-routing.md)
 2. [Secure Agent Harness](02-secure-agent-harness.md)
 3. [Secure Systems Agent](03-secure-systems-agent.md)
