@@ -145,6 +145,30 @@ The most common context format is structured data, like JSON.
 
 Therefore, the context can be serialised into 
 
+```mermaid
+flowchart TD
+    A[Context Sources]
+
+    A --> B1[Messages]
+    A --> B2[Tool Definitions]
+    A --> B3[Structured Data]
+    A --> B4[Retrieved Text]
+    A --> B5[Images / Files]
+    A --> B6[Other Model Inputs]
+
+    B1 --> C[Context Builder]
+    B2 --> C
+    B3 --> C
+    B4 --> C
+    B5 --> C
+    B6 --> C
+
+    C --> D[Internal Context Representation]
+    D --> E[Model Adapter / Serializer]
+    E --> F[Provider-specific Request Schema]
+    F --> G[Model]
+```
+
 #### Key Idea:
 
 Context is model-visible information, not necessarily plain text.
