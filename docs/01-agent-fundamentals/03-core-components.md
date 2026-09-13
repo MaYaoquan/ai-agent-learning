@@ -1,9 +1,9 @@
 # 03 Core Components
 
-## Agender
+## Agenda
 
 ```text
-AI Agent
+AI Agent System
 ├── Model
 ├── Context
 ├── State
@@ -12,37 +12,44 @@ AI Agent
 └── Agent Runtime
 ```
 
-Core Components Table
+## Core Components Table
+
 | Component | Core Question | Responsibility |
 |---|---|---|
 | **Model** | Who thinks? | Reasoning and decision-making |
-| **Context** | What does it currently know? | Information given to the model |
-| **State** | What does it remember? | Persistent task information |
-| **Actions** | What can it do? | Interact with the environment |
-| **Action Runtime** | How is an AgentAction safely turned into a real operation? | Coordinate iterative execution |
-| **Runtime / Harness** | Who manages everything? | Orchestrate the whole Agent |
+| **Context** | What does the model currently know? | Information made visible to the model for the current decision |
+| **State** | What does the agent maintain? | Persistent task and execution information across iterations |
+| **Actions** | What can the agent request to do? | Interact with or change the environment |
+| **Action Runtime** | How is an `AgentAction` safely carried out? | Validate, authorise, dispatch, and observe actions |
+| **Agent Runtime** | Who coordinates the whole system? | Run and coordinate the agent system |
 
+---
 
 ## Model
 
-The Model of an AI Agent is the reasoning and decision-making component of an AI Agent system. It's usually implemented as a large language model, such as GPT, Claude, DeepSeek, Gemini, or Llama.
+The Model is the reasoning and decision-making component of an AI Agent system. It is usually implemented by a large language model such as GPT, Claude, DeepSeek, Gemini, or Llama.
 
-```text
-          Model
-            │
-            ▼
-Observe → Decide → Action
+```mermaid
+flowchart LR
+    A[Context] --> B[Model]
+    B --> C[Decision]
+    C --> D[Action Request]
+    C --> E[Final Answer]
 ```
 
-**Key Idea**:
-The runtime controls the loop, while the model makes decisions inside the loop.
+**Key Idea:**
+
+The Agent Runtime controls the loop, while the Model makes decisions inside the loop.
+
+---
 
 ## Context
 
-The model does not directly observe the environment. It reasons over the context provided by the agent runtime.
+The Model does not directly observe the environment. It reasons over the context provided by the Agent Runtime.
 
-### Definition:
-Context is the set of information made available to the model for a specific inference or decision.
+### Definition
+
+Context is the set of information made available to the Model for a specific inference or decision.
 
 ```text
 Agent State / Memory / Environment
@@ -57,31 +64,28 @@ Agent State / Memory / Environment
 ```
 
 Context may contain:
+
 ```text
 Context
 │
 ├── System Instructions
-│
 ├── User Request / Goal
-│
 ├── Conversation History
-│
 ├── Current Task State
-│
 ├── Previous Actions
-│
 ├── Tool Observations / Results
-│
 ├── Retrieved Knowledge
-│
 ├── Skill Instructions
-│
-├── Available Tool Descriptions
-│
+├── Available Capability Descriptions
 └── Environment Information
 ```
 
-For example: Find the largest Python file and explain it.
+For example, suppose the task is:
+
+> Find the largest Python file and explain what it does.
+
+The model-visible context might contain:
+
 ```text
 System:
 You are a coding assistant.
@@ -110,7 +114,9 @@ Current Question:
 What should I do next?
 ```
 
-The most common context format is structured data, like JSON.
+In an Agent Runtime, context is usually represented internally as a structured data model. When calling a model provider, the Model Adapter serialises this internal representation into the provider-specific request format.
+
+A simplified provider request may look like:
 
 ```json
 {
@@ -141,16 +147,16 @@ The most common context format is structured data, like JSON.
 }
 ```
 
-**Note**: The APIs of different models actually use different schemas. 
+**Note:** Different model providers use different request schemas.
 
-Therefore, the context can be serialised into 
+Different context sources can be collected and normalised into an internal context representation:
 
 ```mermaid
 flowchart TD
     A[Context Sources]
 
     A --> B1[Messages]
-    A --> B2[Tool Definitions]
+    A --> B2[Capability Definitions]
     A --> B3[Structured Data]
     A --> B4[Retrieved Text]
     A --> B5[Images / Files]
@@ -163,21 +169,20 @@ flowchart TD
     B5 --> C
     B6 --> C
 
-    C --> D[Internal Context Representation]
-    D --> E[Model Adapter / Serializer]
+    C --> D[AgentContext - Internal Representation]
+    D --> E[Model Adapter]
     E --> F[Provider-specific Request Schema]
     F --> G[Model]
 ```
 
-#### Key Idea:
+### Key Ideas
 
 Context is model-visible information, not necessarily plain text.
 
-In terms of Implementation, Agent context is an internal structure. Therefore, a provider-independent internal representation of the information that should be visible to the model for the current decision.
+`AgentContext` is a provider-independent internal representation of the information that should be visible to the Model for the current decision.
 
-The Context Builder integrates relevant context from multiple sources into a unified internal representation.
+The Context Builder collects, selects, filters, and organises relevant information from multiple sources into this unified internal representation.
 
-For example:
 ```text
 State / Memory / Tool Results / Retrieved Data
                     ↓
@@ -193,17 +198,21 @@ State / Memory / Tool Results / Retrieved Data
         schema     schema      schema
 ```
 
-
+---
 
 ## State
 
-**Definition**:
-State is the information an agent maintains across iterations that represents the task's current status and lets it continue working coherently.
+### Definition
 
-The clean distinction is:
-State is what the agent maintains. Context is what the model sees.
+State is the information an agent maintains across iterations that represents the task's current status and allows it to continue working coherently.
 
-So the Context Builder typically reads from the current state:
+A useful distinction is:
+
+> **State is what the agent maintains. Context is what the model sees.**
+
+State is the source of truth for the current execution, while Context is a selected model-facing view of that state and other relevant information.
+
+The Context Builder typically reads from the current State:
 
 ```text
 Current State
@@ -226,7 +235,7 @@ Select relevant parts
        Model
 ```
 
-For example, suppose the state is:
+For example:
 
 ```python
 state = {
@@ -244,7 +253,7 @@ state = {
 }
 ```
 
-The model probably needs:
+The Model probably needs:
 
 ```text
 goal
@@ -253,6 +262,7 @@ last_observation
 ```
 
 So the Context Builder might produce:
+
 ```python
 AgentContext(
     goal=state["goal"],
@@ -261,18 +271,20 @@ AgentContext(
 )
 ```
 
-In conclusion, the Context Builder derives the mode-visitable context from the current agent state and other relevant information sources.
+In conclusion, the Context Builder derives the model-visible context from the current Agent State and other relevant information sources.
 
 ```text
 Context = selected view of State + Memory + Tool Results + Retrieved Knowledge + Instructions
 ```
 
+---
 
 ## Actions
 
-An action is an operation selected by the agent to interact with or change its environment.
+An Action is an operation selected by the agent to interact with or change its environment.
 
 Examples include:
+
 - reading a file
 - searching the web
 - executing a command
@@ -281,47 +293,48 @@ Examples include:
 - sending a message
 - delegating work to another agent
 
-The model typically selects or requests an action, while the Agent Runtime validates and executes it.
+The Model produces an action request, which is normalised into an `AgentAction`. The Action Runtime then validates, authorises, and dispatches the action to an appropriate capability provider.
 
 ```mermaid
 flowchart LR
     A[Current State] --> B[Context]
     B --> C[Model]
     C --> D[Decision]
-    D --> E[Action]
-    E --> F[Environment]
-    F --> G[Observation]
-    G --> A
+    D --> E[AgentAction]
+    E --> F[Action Runtime]
+    F --> G[Environment]
+    G --> H[Observation]
+    H --> A
+
+    classDef focus stroke-width:3px,font-weight:bold;
+    class E focus;
 ```
 
-**Action Type**:
+### Action Types
+
 - Read / Observe Actions
 - Write / Modify Actions
 - Execution Actions
 - Communication Actions
 - Delegation Actions
 
-However, there is a gap between an LLM output and an action. AI Agents usually cannot convert natural language text into AgentAction through re-expression. 
-The best way is to let the Model output a structured tool/action request. Then, using the Model Adapter, transfer provider-specific output to a uniform AgentAction.
+### From Model Output to AgentAction
 
-For example:
+There is a gap between Model output and an executable action.
+
+Although an Agent Runtime can parse natural-language Model output into actions, this approach is fragile. Modern agent systems usually prefer structured output or native tool-calling mechanisms so that Model decisions can be reliably normalised into `AgentAction`.
+
 ```text
-Context
-   ↓
-Model
-   ↓
-Provider-specific structured output
+Structured Model Output
    ↓
 Model Adapter
    ↓
 AgentAction
    ↓
-Validation
-   ↓
-Action Runtime (Execute the action)
+Action Runtime
 ```
 
-The structured-output instructions:
+A simplified internal action representation could look like:
 
 ```json
 {
@@ -333,7 +346,7 @@ The structured-output instructions:
 }
 ```
 
-Transfer to AgentAction by Adapter:
+The Model Adapter can normalise a provider-specific response into the internal representation:
 
 ```python
 AgentAction(
@@ -343,46 +356,58 @@ AgentAction(
 )
 ```
 
-
-How to represent an action in Agent Runtime?
-
-An action can be represented as a uniform data structure.
+An action can be represented as a uniform internal data structure:
 
 ```python
+from dataclasses import dataclass
+from typing import Any
+
 @dataclass
 class AgentAction:
-    type: str
+    action_type: str
     name: str
-    arguments: dict
+    arguments: dict[str, Any]
 ```
 
-**One more things:**
+### Action vs Tool
 
-What is the difference between an Action and a Tool in an AI agent?
+An Action is the higher-level operation selected by the Agent.
 
-Action = a conceptual operation. For example:
+For example:
+
 ```text
 Action intent:
 Read a file
 ```
 
-Tool = a concrete executable interface
+A Tool is one possible mechanism for carrying out an Action.
+
+For example:
+
 ```text
 Tool:
 read_file(path="agent.py")
 ```
 
+However, not every Action must be implemented as a local Tool. The execution mechanism may instead be MCP, an external API, a subagent, or another capability provider.
+
 ```mermaid
 flowchart LR
-    A[Model Decision] --> B[Action Intent]
-    B --> C[Tool Selection]
-    C --> D[Tool Execution]
-    D --> E[Observation]
+    A[Model Decision] --> B[AgentAction]
+    B --> C[Action Runtime]
+    C --> D[Action Dispatcher]
+
+    D --> E[Native Capability]
+    D --> F[MCP]
+    D --> G[API]
+    D --> H[Subagent]
 ```
+
+---
 
 ## Action Runtime
 
-The Action Runtime is the execution subsystem responsible for validating, authorising, dispatching, and observing AgentActions.
+The Action Runtime is the execution subsystem responsible for validating, authorising, dispatching, and observing `AgentAction`s.
 
 ```text
 AgentAction
@@ -396,13 +421,15 @@ Authorization / Policy
 Action Dispatcher
     ↓
 Capability Provider
-    ├── Native
+    ├── Native Capability
     ├── MCP
     ├── API
     └── Subagent
     ↓
 Observation
 ```
+
+A more complete view is:
 
 ```mermaid
 flowchart TD
@@ -418,10 +445,11 @@ flowchart TD
     G --> H[AgentAction]
     G --> I[Final Answer]
 
-    H --> J[Policy / Validation]
+    H --> AR[Action Runtime]
+    AR --> J[Policy / Validation]
     J --> K[Action Dispatcher]
 
-    K --> L[Native Tool]
+    K --> L[Native Capability]
     K --> M[MCP Client]
     K --> N[API Client]
     K --> O[Subagent]
@@ -436,5 +464,45 @@ flowchart TD
     Q --> A
 ```
 
+The Action Runtime hides the details of how a capability is actually implemented. The Agent can therefore work with a common `AgentAction` abstraction while the Action Dispatcher routes that action to the appropriate provider.
+
+---
+
 ## Agent Runtime
 
+The Agent Runtime is the software execution layer that coordinates the components required to run an AI Agent.
+
+It does not replace the Agent Loop. Instead, it provides the infrastructure needed for the loop to operate.
+
+```text
+Agent Runtime
+│
+├── Agent Loop
+├── Context Builder
+├── State Management
+├── Model Adapter / Router
+├── Action Runtime
+└── Termination / Error Handling
+```
+
+The Agent Loop defines the iterative control logic, while the Agent Runtime provides the concrete services used by that loop.
+
+For example:
+
+```python
+while can_continue(state):
+    context = context_builder.build(state)
+    decision = model_runtime.generate(context)
+
+    if decision.final_answer:
+        return decision.final_answer
+
+    observation = action_runtime.execute(decision.action)
+    state_manager.update(state, observation)
+```
+
+### Key Idea
+
+> **The Agent Runtime is the execution layer that connects Model, Context, State, and Actions and provides the infrastructure required to run the Agent Loop.**
+
+A production-grade Agent Runtime may later add more capabilities such as sessions, scheduling, sandboxing, tracing, replay, and plugin systems. These topics belong to the later Agent Harness section.
