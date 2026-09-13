@@ -505,4 +505,4 @@ while can_continue(state):
 
 > **The Agent Runtime is the execution layer that connects Model, Context, State, and Actions and provides the infrastructure required to run the Agent Loop.**
 
-A production-grade Agent Runtime may later add more capabilities such as sessions, scheduling, sandboxing, tracing, replay, and plugin systems. These topics belong to the later Agent Harness section.
+A production-grade Agent Runtime may include additional capabilities such as session management, scheduling, sandboxing, tracing, replay, and plugin systems. These advanced runtime capabilities are outside the scope of this fundamentals chapter and will be discussed later when exploring Agent Runtime and Harness architectures.
