@@ -25,5 +25,5 @@ After this chapter, we should be able to explain:
 - [x] Agent Loop
 - [x] Core Components
 - [x] LLM vs Agent
-- [ ] Agent vs Workflow
+- [x] Agent vs Workflow
 - [ ] Mock interview completed
