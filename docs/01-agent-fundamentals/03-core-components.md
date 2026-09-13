@@ -380,6 +380,29 @@ flowchart LR
     D --> E[Observation]
 ```
 
-## Control Loop
+## Action Runtime
 
-## Runtime/Harness
+The Action Runtime is the execution subsystem responsible for validating, authorising, dispatching, and observing AgentActions.
+
+```text
+AgentAction
+    ↓
+Action Runtime
+    ↓
+Validation
+    ↓
+Authorization / Policy
+    ↓
+Action Dispatcher
+    ↓
+Capability Provider
+    ├── Native
+    ├── MCP
+    ├── API
+    └── Subagent
+    ↓
+Observation
+```
+
+## Agent Runtime
+
